@@ -1,0 +1,47 @@
+[
+  {
+    "device_id": "esp-r4-node-01",
+    "timestamp": "2025-04-14T16:00:00",
+    "networks": [
+      {
+        "ssid": "TMOBILE-B811",
+        "rssi": -55
+      },
+      {
+        "ssid": "TMOBILE-8EEA",
+        "rssi": -56
+      }
+    ],
+    "server_received": "2025-04-15T03:04:51.404713"
+  },
+  {
+    "device_id": "esp-r4-node-01",
+    "timestamp": "2025-04-14T16:00:00",
+    "networks": [
+      {
+        "ssid": "TMOBILE-8EEA",
+        "rssi": -58
+      },
+      {
+        "ssid": "TMOBILE-B811",
+        "rssi": -59
+      }
+    ],
+    "server_received": "2025-04-15T03:05:13.671657"
+  },
+  {
+    "device_id": "esp-r4-node-01",
+    "timestamp": "2025-04-14T16:00:00",
+    "networks": [
+      {
+        "ssid": "TMOBILE-B811",
+        "rssi": -56
+      },
+      {
+        "ssid": "TMOBILE-8EEA",
+        "rssi": -58
+      }
+    ],
+    "server_received": "2025-04-15T03:05:35.781042"
+  }
+]
