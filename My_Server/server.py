@@ -11,6 +11,21 @@ if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, 'w') as f:
         json.dump([], f)
 
+def get_data():
+    try:
+        with open(DATA_FILE) as f:
+            return json.load(f)[::-1]  # Most recent first
+    except:
+        return []
+
+@app.route('/')
+def home():
+    return render_template("dashboard.html", entries=get_data())
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template("dashboard.html", entries=get_data())
+
 @app.route('/upload', methods=['POST'])
 def upload():
     data = request.get_json()
@@ -31,16 +46,6 @@ def upload():
     print(f"Received from {data['device_id']}: {len(data['networks'])} networks")
 
     return jsonify({"status": "ok"}), 200
-
-@app.route('/dashboard')
-def dashboard():
-    try:
-        with open(DATA_FILE) as f:
-            data = json.load(f)
-    except:
-        data = []
-
-    return render_template("dashboard.html", entries=data[::-1])  # most recent first
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
