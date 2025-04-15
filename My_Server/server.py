@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 app = Flask(__name__)
@@ -34,7 +34,7 @@ def upload():
         return jsonify({"status": "error", "message": "Invalid data"}), 400
 
     # Add server-side timestamp
-    data['server_received'] = datetime.utcnow().isoformat()
+    data['server_received'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
 
     # Append to file
     with open(DATA_FILE, 'r+') as f:

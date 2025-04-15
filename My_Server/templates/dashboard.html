@@ -7,13 +7,14 @@
         .card { background: white; border-radius: 8px; padding: 1em; margin-bottom: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .ssid { font-weight: bold; }
     </style>
+    <meta http-equiv="refresh" content="25">
 </head>
 <body>
     <h1>📶 Wi-Fi Presence Dashboard</h1>
     {% for entry in entries %}
     <div class="card">
         <div><strong>Device:</strong> {{ entry.device_id }}</div>
-        <div><strong>Timestamp:</strong> {{ entry.timestamp }}</div>
+        <div><strong>Timestamp:</strong> {{ entry.server_received }}</div>
         <div><strong>Networks:</strong></div>
         <ul>
             {% for net in entry.networks %}
