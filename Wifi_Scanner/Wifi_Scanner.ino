@@ -4,7 +4,7 @@
 #include <ArduinoHttpClient.h>
 
 char ssid[] = "TMOBILE-B811";     // network SSID (name)
-char pass[] = "**********"; // network password 
+char pass[] = "cda462a7c9";       // network password 
 
 char serverAddress[] = "192.168.12.197"; // Flask server IP
 int port = 5000;
@@ -32,7 +32,7 @@ void setup() {
 
 void loop() {
   scanAndSend();
-  delay(15000); // Wait 15 seconds between scans
+  delay(1000); // Wait 1 second between scans (you can adjust later)
 }
 
 void scanAndSend() {
@@ -48,10 +48,14 @@ void scanAndSend() {
   json += "\"device_id\":\"" + deviceId + "\",";
   json += "\"timestamp\":\"" + getISOTime() + "\",";
   json += "\"networks\":[";
+
   for (int i = 0; i < numNetworks; i++) {
     json += "{";
     json += "\"ssid\":\"" + String(WiFi.SSID(i)) + "\",";
-    json += "\"rssi\":" + String(WiFi.RSSI(i));
+    json += "\"rssi\":" + String(WiFi.RSSI(i)) + ",";
+    json += "\"bssid\":\"" + WiFi.BSSIDstr(i) + "\",";
+    json += "\"channel\":" + String(WiFi.channel(i)) + ",";
+    json += "\"encryption\":\"" + encryptionTypeString(WiFi.encryptionType(i)) + "\"";
     json += "}";
     if (i < numNetworks - 1) json += ",";
   }
@@ -78,8 +82,21 @@ void scanAndSend() {
 }
 
 String getISOTime() {
-  // This is a dummy time since Arduino R4 WiFi has no RTC or NTP by default.
+  // Dummy time — can later be improved with NTP if needed
   return "2025-04-14T16:00:00";
+}
+
+String encryptionTypeString(uint8_t type) {
+  switch (type) {
+    case WIFI_AUTH_OPEN:           return "Open";
+    case WIFI_AUTH_WEP:            return "WEP";
+    case WIFI_AUTH_WPA_PSK:        return "WPA";
+    case WIFI_AUTH_WPA2_PSK:       return "WPA2";
+    case WIFI_AUTH_WPA_WPA2_PSK:   return "WPA/WPA2";
+    case WIFI_AUTH_WPA2_ENTERPRISE:return "WPA2-Enterprise";
+    case WIFI_AUTH_WPA3_PSK:       return "WPA3";
+    default:                       return "Unknown";
+  }
 }
 
 void printWiFiStatus() {
@@ -87,7 +104,7 @@ void printWiFiStatus() {
   Serial.println(WiFi.SSID());
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
-  Serial.print("Signal strength (RSSI):");
+  Serial.print("Signal strength (RSSI): ");
   Serial.print(WiFi.RSSI());
   Serial.println(" dBm");
 }
