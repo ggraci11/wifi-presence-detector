@@ -34,7 +34,7 @@ def upload():
         return jsonify({"status": "error", "message": "Invalid data"}), 400
 
     # Add server-side timestamp
-    data['server_received'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+    data['server_received'] = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 
     # Append to file
     with open(DATA_FILE, 'r+') as f:
