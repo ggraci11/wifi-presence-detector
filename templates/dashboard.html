@@ -46,7 +46,7 @@
 
 <h1>WiFi Presence Dashboard</h1>
 
-{% for entry in entries %}
+{% if entry %}
   <div class="entry">
     <h2>Device: {{ entry.device_id }}</h2>
     <div class="timestamp">
@@ -67,7 +67,7 @@
   </div>
 {% else %}
   <p>No data available yet.</p>
-{% endfor %}
+{% endif %}
 
 </body>
 </html>
