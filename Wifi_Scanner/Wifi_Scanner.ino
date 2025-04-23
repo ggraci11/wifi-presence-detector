@@ -1,22 +1,21 @@
 #include <WiFiS3.h>
-#include <WiFiClient.h>
 #include <WiFiSSLClient.h>
 #include <ArduinoHttpClient.h>
 
-char ssid[] = "TMOBILE-B811";     // Your network SSID
-char pass[] = "cda462a7c9";        // Your network password
+char ssid[] = "TMOBILE-B811";     // your Wi-Fi network name
+char pass[] = "cda462a7c9";       // your Wi-Fi password
 
-char serverAddress[] = "192.168.12.197"; // Flask server IP
-int port = 5000;
+char serverAddress[] = "wifi-presence-detector.onrender.com";
+int port = 443; // HTTPS port
 
 int status = WL_IDLE_STATUS;
-WiFiClient wifi;
+WiFiSSLClient wifi; // SSL client for HTTPS
 HttpClient client = HttpClient(wifi, serverAddress, port);
 
-String deviceId = "esp-r4-node-01"; // Unique device ID
+String deviceId = "Arduino R4"; // Unique ID for device
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   while (!Serial);
 
   Serial.print("Connecting to WiFi");
@@ -25,25 +24,40 @@ void setup() {
     delay(2000);
     Serial.print(".");
   }
+
   Serial.println("\nConnected to WiFi!");
   printWiFiStatus();
 }
 
 void loop() {
   scanAndSend();
-  delay(2000); // Scan every 2 seconds
+  delay(5000); // 5 seconds between scans
 }
 
 void scanAndSend() {
   Serial.println("Scanning WiFi networks...");
   int numNetworks = WiFi.scanNetworks();
 
-  if (numNetworks <= 0) {
-    Serial.println("Scan failed or no networks found.");
+  if (numNetworks == -1) {
+    Serial.println("Scan failed");
     return;
   }
 
-  String json = buildJson(numNetworks);
+  String json = "{";
+  json += "\"device_id\":\"" + deviceId + "\",";
+  json += "\"timestamp\":\"" + getISOTime() + "\",";
+  json += "\"networks\":[";
+
+  for (int i = 0; i < numNetworks; i++) {
+    json += "{";
+    json += "\"ssid\":\"" + String(WiFi.SSID(i)) + "\",";
+    json += "\"rssi\":" + String(WiFi.RSSI(i)) + ",";
+    json += "\"encryption\":\"" + encryptionTypeString(WiFi.encryptionType(i)) + "\"";
+    json += "}";
+    if (i < numNetworks - 1) json += ",";
+  }
+
+  json += "]}";
 
   Serial.println("Sending JSON:");
   Serial.println(json);
@@ -63,34 +77,11 @@ void scanAndSend() {
   Serial.println(statusCode);
   Serial.print("Response: ");
   Serial.println(response);
-
-  if (statusCode != 200) {
-    Serial.println("⚠️ Warning: Failed to upload scan data!");
-  }
 }
 
-String buildJson(int numNetworks) {
-  String json = "{";
-  json += "\"device_id\":\"" + deviceId + "\",";
-  json += "\"timestamp\":\"" + getISOTime() + "\",";
-  json += "\"networks\":[";
-
-  for (int i = 0; i < numNetworks; i++) {
-    json += "{";
-    json += "\"ssid\":\"" + escapeJson(WiFi.SSID(i)) + "\",";
-    json += "\"rssi\":" + String(WiFi.RSSI(i)) + ",";
-    json += "\"encryption\":\"" + encryptionTypeString(WiFi.encryptionType(i)) + "\"";
-    json += "}";
-    if (i < numNetworks - 1) json += ",";
-  }
-
-  json += "]}";
-  return json;
-}
-
-// Dummy timestamp (or replace with real if you add NTP later)
 String getISOTime() {
-  return "2025-04-16T00:00:00Z";
+  // Placeholder timestamp (you can integrate NTP if needed)
+  return "2025-04-16T20:00:00";
 }
 
 void printWiFiStatus() {
@@ -103,15 +94,8 @@ void printWiFiStatus() {
   Serial.println(" dBm");
 }
 
-// Escape quotes inside SSIDs
-String escapeJson(String input) {
-  input.replace("\"", "\\\"");
-  return input;
-}
-
-// Helper function to translate encryption type
-String encryptionTypeString(int type) {
-  switch (type) {
+String encryptionTypeString(int thisType) {
+  switch (thisType) {
     case ENC_TYPE_WEP: return "WEP";
     case ENC_TYPE_TKIP: return "WPA";
     case ENC_TYPE_CCMP: return "WPA2";
