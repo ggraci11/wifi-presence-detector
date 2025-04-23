@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WiFi Presence Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+    }
+    .entry {
+      background: white;
+      padding: 15px;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 800px;
+    }
+    .entry h2 {
+      margin-top: 0;
+      color: #333;
+    }
+    .networks {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+    .network {
+      margin-bottom: 8px;
+      padding: 8px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+    }
+    .timestamp {
+      color: gray;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>WiFi Presence Dashboard</h1>
+
+{% for entry in entries %}
+  <div class="entry">
+    <h2>Device: {{ entry.device_id }}</h2>
+    <div class="timestamp">
+      Sent: {{ entry.timestamp }} <br>
+      Server Received: {{ entry.server_received }}
+    </div>
+
+    <div class="networks">
+      <h3>Networks Detected:</h3>
+      {% for net in entry.networks %}
+        <div class="network">
+          <strong>SSID:</strong> {{ net.ssid or "Hidden" }}<br>
+          <strong>Signal:</strong> {{ net.rssi }} dBm<br>
+          <strong>Encryption:</strong> {{ net.encryption }}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% else %}
+  <p>No data available yet.</p>
+{% endfor %}
+
+</body>
+</html>
